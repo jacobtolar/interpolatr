@@ -1,0 +1,1 @@
+$(foo_setting) and $(bar_setting)

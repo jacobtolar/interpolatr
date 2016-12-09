@@ -1,0 +1,6 @@
+settings:
+  sample_setting: child_value
+  other_setting: other_setting
+
+base: 
+  - [ base.yaml ] 

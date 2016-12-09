@@ -1,0 +1,91 @@
+#!/usr/bin/env python2.7
+
+# Copyright 2017, Yahoo Inc.
+# Licensed under the terms of the Apache License, Version 2.0.
+# See the LICENSE file associated with the project for terms.
+
+"""
+Utility to interpolate properties into a file.
+
+This command-line tool currently includes support for pulling in properties
+from the command line and/or a hierarchical set of YAML files. These
+configuration sources are used to interpolate template files and write out
+the results.
+
+However, the code used by this tool should be fairly extensible. So if you'd
+like to pull in your configuration settings from a java-style .properties file,
+and write them out to some sort of key-value store, that should be pretty
+simple to do as well.
+
+Eventually, this command line tool may be updated to more easily accommodated
+other use cases; for now, you'll need to write your own tool if you want
+to extend the library classes in any way.
+"""
+
+from __future__ import print_function
+
+import click
+from collections import defaultdict
+import logging
+import os
+import sys
+
+from interpolatr import ChainedConfigSource, CliConfigSource
+from interpolatr.util import InterpolatrCommand, setup_logging
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
+
+
+@click.group(cls=InterpolatrCommand, chain=True, invoke_without_command=False,
+             no_args_is_help=True)
+@click.option('--debug', help='Enable debug-level logging.', is_flag=True)
+@click.option('--overrides', '-D', help='Overriden properties, ie -D foo=bar',
+              multiple=True)
+@click.pass_context
+def interpolate(ctx, debug, overrides):
+    """
+    Interpolate files in target_dir using yaml config definition pointed to
+    by environment.
+    """
+    setup_logging(debug, 'interpolate.log')
+    logger.debug('interpolate called with args: {}'.format(sys.argv))
+
+
+@interpolate.resultcallback()
+@click.pass_context
+def finalize(ctx, subcmds, debug, overrides):
+    cmds = defaultdict(list)
+
+    for obj in subcmds:
+        cmds[obj.object_type()].append(obj)
+
+    if 'ConfigSource' not in cmds:
+        logger.info('No configuration class instantiated; only using cli config')
+        config = ChainedConfigSource()
+    else:
+        config = ChainedConfigSource(*cmds['ConfigSource'])
+
+    suppliers = []
+    if 'SinkSupplier' not in cmds:
+        logger.warn('No sink suppliers found: no interpolation to perform!')
+    else:
+        suppliers = cmds['SinkSupplier']
+
+    conf = ChainedConfigSource(
+        CliConfigSource(overrides),
+        config
+    )
+
+    if logger.isEnabledFor(logging.DEBUG):
+        logger.debug('Found configuration values: \n{0}\n'.format(
+            conf.dump())
+        )
+
+
+    for supplier in suppliers:
+        for template in supplier:
+            template.commit(conf)
+
+if __name__ == '__main__':
+    interpolate()

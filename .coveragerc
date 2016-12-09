@@ -1,0 +1,24 @@
+[run]
+parallel = True
+
+omit =
+    /usr*
+    setup.py
+    *egg*
+    .venv/*
+
+cover_pylib = False
+
+source = interpolatr
+
+[report]
+exclude_lines =
+    pragma: no cover
+    ^def test_
+
+    # Don't complain about missing debug-only code:
+    def __repr__
+
+    # Don't complain if non-runnable code isn't run:
+    if __name__ == .__main__.:
+
