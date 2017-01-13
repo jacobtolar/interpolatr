@@ -36,7 +36,7 @@ def default_finalize(ctx, thing):
         - A hacky 1-level lookup back into the context if we get something
           that looks like a key. (Assumes keys look like $(...).
     """
-    if not thing:
+    if thing is None:
         return ''
 
     m = TOKEN_PAT.match(str(thing))
