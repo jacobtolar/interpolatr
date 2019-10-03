@@ -135,7 +135,7 @@ class YamlConfigSource(ConfigSourceBase):
 
         conf = None
         with open(self.abspath) as f:
-            conf = yaml.load(f.read())
+            conf = yaml.safe_load(f.read())
             if not conf:
                 logger.warning(
                     'Configuration file {0} seems to be empty'.format(
