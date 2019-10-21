@@ -50,7 +50,8 @@ setup(
     zip_safe=False,
     classifiers=(
             'Programming Language :: Python',
-            'Programming Language :: Python :: 2.7'
+            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python :: 3.6'
     ),
     scripts=['scripts/interpolatr'],
     extras_require=extras_require

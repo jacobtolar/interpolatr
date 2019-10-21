@@ -26,7 +26,7 @@ from .compat import string_type
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-TOKEN_PAT = re.compile('^\$\((.*)\)$')
+TOKEN_PAT = re.compile(r'^\$\((.*)\)$')
 
 
 class ConfigSourceBase(collections.Mapping):

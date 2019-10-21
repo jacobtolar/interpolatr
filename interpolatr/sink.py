@@ -18,7 +18,7 @@ from jinja2 import Environment, FileSystemLoader, contextfunction
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
-TOKEN_PAT = re.compile('^\$\((.*)\)$')
+TOKEN_PAT = re.compile(r'^\$\((.*)\)$')
 
 
 def replace_regex_jinja(inp, find, replace):
